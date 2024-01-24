@@ -1,0 +1,25 @@
+.sideContainer {
+    position: absolute;
+    width: 240px;
+    top: 120px;
+    left: 20px;
+    border-radius: 20px;
+    text-align: center;
+    z-index: 999;
+}
+
+.innerContainer {
+    margin: 10px 15px;
+}
+
+.choiceBar {
+    width: 220px;
+    font-size: 50px;
+    border-radius: 15px;
+    padding: 10px;
+
+    &:hover {
+
+        background-color: gold;
+    }
+}

@@ -36,3 +36,15 @@
     transform: rotate(360deg);
   }
 }
+
+.subColor {
+  background-color: darkorange;
+}
+
+.mainContainer {
+  background-color: black;
+}
+
+body {
+  background-color: #282c34;
+}
