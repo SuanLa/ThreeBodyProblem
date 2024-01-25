@@ -1,19 +1,21 @@
-import {Canvas} from "@react-three/fiber";
+import {Canvas, useThree} from "@react-three/fiber";
 import {useState} from "react";
+
+import "./../css/Object.css";
 
 export default function Object(){
 
-    const position = useState([0, 0, 5]);
-    const intensity = useState(0.1);
-    const args = useState([6, 6, 6]);
+    const position = useThree;
+    const intensity = useState();
+    const args = useState();
 
     return (
         <div id="canvas-container">
             <Canvas>
-                <ambientLight intensity={intensity} />
-                <directionalLight color="red" position={position} />
-                <mesh position={[10, 10, 10]}>
-                    <boxGeometry args={args} />
+                <ambientLight intensity={0.1} />
+                <directionalLight color={"red"} position={[0, 0, 5]} />
+                <mesh>
+                    <boxGeometry args={[2, 2, 2]}/>
                     <meshStandardMaterial />
                 </mesh>
             </Canvas>

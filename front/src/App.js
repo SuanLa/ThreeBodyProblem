@@ -10,8 +10,8 @@ function App() {
           <header>
               <Navigation/>
           </header>
-          <main className={"mainContainer"}>
-              <Object/>
+          <main>
+            <Object/>
           </main>
           <aside>
               <Sider/>
