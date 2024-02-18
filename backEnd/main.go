@@ -2,6 +2,7 @@ package main
 
 import (
 	"backEnd/algorithm"
+	"backEnd/middleware"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -12,6 +13,8 @@ var ws = websocket.Upgrader{ReadBufferSize: 1024, WriteBufferSize: 1024}
 
 func main() {
 	engine := gin.New()
+
+	engine.Use(middleware.Recovery())
 
 	engine.GET("/ws", wsHandler)
 

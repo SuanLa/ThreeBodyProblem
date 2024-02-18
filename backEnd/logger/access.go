@@ -1,6 +1,14 @@
 package logger
 
-import "go.uber.org/zap"
+import (
+	"github.com/spf13/viper"
+	"go.uber.org/zap"
+)
+
+func init() {
+	logConf := viper.GetString("log")
+
+}
 
 func accessLogger() (*zap.Logger, error) {
 	config := zap.Config{
