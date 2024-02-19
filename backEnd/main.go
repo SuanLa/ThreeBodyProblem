@@ -1,61 +1,34 @@
 package main
 
 import (
-	"backEnd/algorithm"
 	"backEnd/middleware"
-	"encoding/json"
+	"backEnd/router"
+	"backEnd/utils/logger"
 	"github.com/gin-gonic/gin"
-	"github.com/gorilla/websocket"
+	"github.com/spf13/viper"
 	"log"
 )
 
-var ws = websocket.Upgrader{ReadBufferSize: 1024, WriteBufferSize: 1024}
+func starter() {
+	viper.SetConfigType("yaml")
+	viper.SetConfigFile("./config/application.yaml")
+	err := viper.ReadInConfig()
+	if err != nil {
+		log.Fatal("Error reading configs fileCreater, %s", err)
+	}
 
-func main() {
-	engine := gin.New()
-
-	engine.Use(middleware.Recovery())
-
-	engine.GET("/ws", wsHandler)
-
-	log.Println("Server started on 6750")
-	log.Fatal(engine.Run())
-	engine.Run(":6750")
+	logger.NewAccess()
+	logger.NewBusiness()
 }
 
-func wsHandler(c *gin.Context) {
-	upgrade, err := ws.Upgrade(c.Writer, c.Request, nil)
-	if err != nil {
-		log.Println(err)
-		return
-	}
+func main() {
+	starter()
 
-	defer func(upgrade *websocket.Conn) {
-		err := upgrade.Close()
-		if err != nil {
-			log.Println(err)
-		}
-	}(upgrade)
+	engine := gin.New()
 
-	for {
-		messageType, p, err := upgrade.ReadMessage()
-		if err != nil {
-			log.Println(err)
-			return
-		}
+	engine.Use(middleware.Logger())
+	engine.Use(middleware.Recovery())
+	engine.Use(middleware.Auth())
 
-		log.Println(string(p))
-		err = json.Unmarshal(p, &algorithm.ArrayObjects{})
-		if err != nil {
-			return
-		}
-
-		//TODO 开启协程和管道处理数据并主动推送到前端
-
-		err = upgrade.WriteMessage(messageType, p)
-		if err != nil {
-			log.Println(err)
-			return
-		}
-	}
+	router.Router(engine)
 }

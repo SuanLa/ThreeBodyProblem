@@ -1,4 +1,4 @@
-package utils
+package result
 
 import (
 	"github.com/gin-gonic/gin"
@@ -34,6 +34,7 @@ func Success(c *gin.Context, msg string, data interface{}) {
 	})
 }
 
+// 服务器内部错误
 func Panic(c *gin.Context, msg string, data interface{}) {
 	c.JSON(http.StatusInternalServerError, result{
 		Code: ERROR,

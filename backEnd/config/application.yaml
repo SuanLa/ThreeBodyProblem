@@ -1,3 +1,7 @@
+server:
+  port: 8080
+
 log:
-  access:
-  buessiness:
+  path:
+    access: "./logs/access.log"
+    business: "./logs/business.log"
