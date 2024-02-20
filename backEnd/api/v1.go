@@ -2,6 +2,7 @@ package api
 
 import (
 	"backEnd/algorithm"
+	"backEnd/utils/logger"
 	"backEnd/utils/result"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
@@ -49,6 +50,7 @@ func WsHandler(c *gin.Context) {
 }
 
 func TestHandler(c *gin.Context) {
+	logger.Business.Info("test")
 	result.Success(c, "hello", nil)
 	return
 }

@@ -9,10 +9,10 @@ import (
 // 这里定义路由
 func Router(c *gin.Engine) {
 
-	c.Group("/ws")
+	v1 := c.Group("/v1")
 	{
-		c.GET("/test", api.TestHandler)
-		c.GET("/track", api.WsHandler)
+		v1.GET("/test", api.TestHandler)
+		v1.GET("/track", api.WsHandler)
 	}
 
 	port := viper.GetString("server.port")

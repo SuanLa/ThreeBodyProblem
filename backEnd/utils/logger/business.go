@@ -1,7 +1,7 @@
 package logger
 
 import (
-	"backEnd/utils/fileCreater"
+	"backEnd/utils/fileGenerator"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -15,7 +15,7 @@ func NewBusiness() {
 	path = viper.GetString("log.path.business")
 	stat, err := os.Stat(path)
 	if os.IsNotExist(err) || (stat != nil && stat.IsDir()) {
-		err := fileCreater.FileGenerator(path)
+		err := fileGenerator.FileGenerator(path)
 		if err != nil {
 			log.Fatal("Failed to create business log file:", err)
 		}
@@ -45,7 +45,7 @@ func businessLogger() (*zap.Logger, error) {
 			EncodeCaller:   zapcore.ShortCallerEncoder,
 		},
 		OutputPaths:      []string{"stdout", viper.GetString("log.path.business")},
-		ErrorOutputPaths: []string{"error.log"},
+		ErrorOutputPaths: []string{errorPath},
 	}
 
 	build, err := config.Build()

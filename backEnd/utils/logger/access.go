@@ -1,7 +1,7 @@
 package logger
 
 import (
-	"backEnd/utils/fileCreater"
+	"backEnd/utils/fileGenerator"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -10,15 +10,25 @@ import (
 )
 
 var (
-	Access *zap.Logger
-	path   string
+	Access    *zap.Logger
+	path      string
+	errorPath string
 )
 
 func NewAccess() {
 	path = viper.GetString("log.path.access")
 	stat, err := os.Stat(path)
 	if os.IsNotExist(err) || (stat != nil && stat.IsDir()) {
-		err := fileCreater.FileGenerator(path)
+		err := fileGenerator.FileGenerator(path)
+		if err != nil {
+			log.Fatal("Failed to create access log file:", err)
+		}
+	}
+
+	errorPath = viper.GetString("log.path.error")
+	stat, err = os.Stat(errorPath)
+	if os.IsNotExist(err) || (stat != nil && stat.IsDir()) {
+		err := fileGenerator.FileGenerator(errorPath)
 		if err != nil {
 			log.Fatal("Failed to create access log file:", err)
 		}
@@ -50,7 +60,7 @@ func accessLogger() (*zap.Logger, error) {
 			EncodeCaller:   zapcore.ShortCallerEncoder,
 		},
 		OutputPaths:      []string{"stdout", path},
-		ErrorOutputPaths: []string{"error.log"},
+		ErrorOutputPaths: []string{errorPath},
 	}
 
 	return config.Build() // 返回一个Logger实例

@@ -14,7 +14,7 @@ func starter() {
 	viper.SetConfigFile("./config/application.yaml")
 	err := viper.ReadInConfig()
 	if err != nil {
-		log.Fatal("Error reading configs fileCreater, %s", err)
+		log.Fatal("Error reading configs fileGenerator, %s", err)
 	}
 
 	logger.NewAccess()
