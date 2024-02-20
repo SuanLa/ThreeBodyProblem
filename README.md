@@ -1,5 +1,9 @@
 # ThreeBodyProblem
-三体问题仿真，前端采用react和three.js引擎渲染，后端使用go语言开发，并通过websocket通信，进行数据的传递。
+三体问题的仿真，通过前端的渲染引擎来动态展示三体问题的变化。而后端采用go语言计算三体的实时位置，并通过websocket协议主动推送给前端。达到三体问题在前端的仿真。
+
+- 前端采用react和three.js引擎渲染
+- 后端使用go语言开发
+- 并通过websocket通信，进行数据的传递。
 
 
 
@@ -15,8 +19,9 @@
 
 ## 后端
 
-| 框架 | 说明                                                         | 链接                             |
-| ---- | ------------------------------------------------------------ | -------------------------------- |
-| gin  | Gin 是一个用 Go (Golang) 编写的 HTTP Web 框架。 它具有类似 Martini 的 API，但性能比 Martini 快 40 倍。 | https://github.com/gin-gonic/gin |
-| zap  | Go 中极快、结构化、分级的日志记录。                          | https://github.com/uber-go/zap   |
+| 框架  | 说明                                                         | 链接                             |
+| ----- | ------------------------------------------------------------ | -------------------------------- |
+| gin   | Gin 是一个用 Go (Golang) 编写的 HTTP Web 框架。 它具有类似 Martini 的 API，但性能比 Martini 快 40 倍。 | https://github.com/gin-gonic/gin |
+| zap   | Go 中极快、结构化、分级的日志记录。                          | https://github.com/uber-go/zap   |
+| viper | Viper 是 Go 应用程序（包括 the_twelve_factors）的完整配置解决方案。 它被设计为在应用程序中工作，可以处理所有类型的配置需求 和格式 | https://github.com/spf13/viper   |
 
