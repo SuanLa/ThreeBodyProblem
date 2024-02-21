@@ -14,10 +14,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import MailIcon from '@mui/icons-material/Mail';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import MoreIcon from '@mui/icons-material/MoreVert';
 
 import "../css/App.css";
-import Sider from "./SideNavigation";
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -176,7 +174,7 @@ export default function Navigation() {
                         component="div"
                         sx={{ display: { xs: 'none', sm: 'block' } }}
                     >
-                        MUI
+                        Three
                     </Typography>
                     <Search>
                         <SearchIconWrapper>

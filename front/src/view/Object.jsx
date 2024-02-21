@@ -1,24 +1,36 @@
-import {Canvas, useThree} from "@react-three/fiber";
-import {useState} from "react";
-
+import {useFrame, useLoader} from "@react-three/fiber";
 import "./../css/Object.css";
+import {TextureLoader} from "three";
 
-export default function Object(){
+import img_1 from "./../img/img_1.png"
+import img_6 from "./../img/img_6.png"
+import img_5 from "./../img/img_5.png"
+import {useRef} from "react";
 
-    const position = useThree;
-    const intensity = useState();
-    const args = useState();
+export default function Object({position}){
+    const [colorMap, specularMap, normalMap] = useLoader(TextureLoader, [img_1, img_6, img_5])
+    const myMesh = useRef()
+
+    useFrame(({ clock }) => {
+        myMesh.current.rotation.y = clock.getElapsedTime()
+    })
 
     return (
-        <div id="canvas-container">
-            <Canvas>
-                <ambientLight intensity={0.1} />
-                <directionalLight color={"red"} position={[0, 0, 5]} />
-                <mesh>
-                    <boxGeometry args={[2, 2, 2]}/>
-                    <meshStandardMaterial />
-                </mesh>
-            </Canvas>
-        </div>
+        <>
+            <ambientLight intensity={1}/>
+            <directionalLight position={position}/>
+            <mesh
+                onClick={(e) => console.log(position)}
+                position={[1,1,1]}
+                ref={myMesh}
+            >
+                <sphereGeometry/>
+                <meshStandardMaterial
+                    map={colorMap}
+                    roughnessMap={specularMap}
+                    normalMap={normalMap}
+                />
+            </mesh>
+        </>
     )
 }
