@@ -1,7 +1,7 @@
 let ws;
 
 function connect(){
-    ws = new WebSocket("ws://localhost:6750/ws");
+    ws = new WebSocket("ws://localhost:6750/v1/test");
     ws.onopen = () => {
         ws.send("ping")
     }
