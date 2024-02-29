@@ -1,5 +1,7 @@
 # <div align='center'>Three Body Problem</div>
 
+<div align='center'> <img src="https://github.com/SuanLa/ThreeBodyProblem/blob/main/front/public/fav.png"></div>
+
 三体问题的仿真，通过前端的渲染引擎来动态展示三体问题的变化。而后端采用go语言计算三体的实时位置，并通过websocket协议主动推送给前端。达到三体问题在前端的仿真。
 
 - 前端采用react和three.js引擎渲染
