@@ -1,4 +1,5 @@
-# <center>ThreeBodyProblem </center>
+# <div align='center'>Three Body Problem</div>
+
 三体问题的仿真，通过前端的渲染引擎来动态展示三体问题的变化。而后端采用go语言计算三体的实时位置，并通过websocket协议主动推送给前端。达到三体问题在前端的仿真。
 
 - 前端采用react和three.js引擎渲染
@@ -11,8 +12,8 @@
 
 | 框架              | 使用                                                         | 链接                                        |
 | ----------------- | ------------------------------------------------------------ | ------------------------------------------- |
-| react             | 用于构建 Web 和原生交互界面的库                              | https://github.com/facebook/react           |
-| three             | 仿真模型                                                     | https://github.com/mrdoob/three.js          |
+| react             | 用于构建 Web 和原生交互界面的框架。                          | https://github.com/facebook/react           |
+| three             | Three.js 是一款 webGL引擎，可以运行于所有支持 webGL 的浏览器。 | https://github.com/mrdoob/three.js          |
 | React-three-fiber | 一个基于 React 的 3D 渲染库，它将 three.js 的强大渲染能力与 React 的声明式编程模型相结合。使用 react-three-fiber，您可以使用 React 的组件化开发方式来创建复杂的 3D 场景，同时利用 React 的状态管理和生命周期钩子来控制场景的交互和动画。 | https://github.com/pmndrs/react-three-fiber |
 
 
