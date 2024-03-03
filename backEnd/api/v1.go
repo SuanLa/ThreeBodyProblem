@@ -1,8 +1,9 @@
 package api
 
 import (
-	"backEnd/algorithm"
+	"backEnd/service"
 	"backEnd/utils/logger"
+	"backEnd/utils/protocol"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -35,20 +36,24 @@ func WsHandler(c *gin.Context) {
 
 		logger.Business.Info("msg", zap.String("msg", string(p)))
 
-		//TODO 解析前端传递的协议
-		err = json.Unmarshal(p, &algorithm.ArrayObjects{})
+		var ptc *protocol.Protocol
+		// 解析前端传递的协议
+		err = json.Unmarshal(p, &ptc)
 		if err != nil {
 			logger.Business.Error("websocket connection read failed", zap.Error(err))
 			return
 		}
 
-		//TODO 开启协程和管道处理数据并主动推送到前端
+		//数据处理
+		bytes := service.Control(ptc.GetObjects())
 
-		err = upgrade.WriteMessage(messageType, p)
+		//主动推送到前端
+		err = upgrade.WriteMessage(messageType, bytes)
 		if err != nil {
 			logger.Business.Error("websocket connection write failed", zap.Error(err))
 			return
 		}
+
 	}
 }
 
