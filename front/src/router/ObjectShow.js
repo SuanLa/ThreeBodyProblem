@@ -2,6 +2,9 @@ import {Canvas} from "@react-three/fiber";
 import Object from "../view/Object";
 import {Button, ButtonGroup} from "@mui/material";
 import {useState} from "react";
+import {connect} from "../http/websocket";
+
+let webSocket;
 
 const objs = new useState([]);
 
@@ -9,8 +12,22 @@ const maps = objs.map(
     object => <Object position={object.psi}/>
 )
 
+// websocket回调函数
+function messageHandler(message){
+    objs.splice(message.data);
+}
+
+// websocket连接后端
 const startRunning = () => {
-    connect()
+    const url = "ws://localhost:6750/v1/test";
+    webSocket = connect(url, messageHandler);
+}
+
+// websocket断开连接
+const stopRunning = () => {
+    if (webSocket !== null){
+        webSocket.close();
+    }
 }
 
 export default function Show(){
