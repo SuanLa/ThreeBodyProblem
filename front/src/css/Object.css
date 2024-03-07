@@ -7,3 +7,10 @@
     background-color: rgba(180, 250, 250, 90%);
     background-image: linear-gradient(142deg, rgba(40,140,246,0.9) 20%, rgba(148,100,211,0.7) 92%);
 }
+
+.btu-g {
+    position: absolute;
+    left: 500px;
+    bottom: 100px;
+    z-index: 3000;
+}

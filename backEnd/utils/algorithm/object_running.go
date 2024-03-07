@@ -13,3 +13,8 @@ func (ao *ArrayObjects) GetObjects() []Object {
 func (ao *ArrayObjects) Add(obj Object) {
 
 }
+
+// 计算物体加速度的方法
+func (ao *ArrayObjects) Acceleration() {
+
+}
