@@ -8,10 +8,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"
+	"net/http"
 )
 
 var (
-	ws          = websocket.Upgrader{ReadBufferSize: 1024, WriteBufferSize: 1024}
+	ws = websocket.Upgrader{ReadBufferSize: 1024, WriteBufferSize: 1024, CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
+	}
 	upgrade     *websocket.Conn
 	messageType int
 	p           []byte

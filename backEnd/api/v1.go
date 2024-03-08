@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"
+	"net/http"
 )
 
 func WsHandler(c *gin.Context) {
@@ -17,7 +18,10 @@ func WsHandler(c *gin.Context) {
 }
 
 func TestHandler(c *gin.Context) {
-	wst := websocket.Upgrader{ReadBufferSize: 1024, WriteBufferSize: 1024}
+	wst := websocket.Upgrader{ReadBufferSize: 1024, WriteBufferSize: 1024, CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
+	}
 	upgrade, err := wst.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		logger.Business.Error("websocket connection failed", zap.Error(err))
