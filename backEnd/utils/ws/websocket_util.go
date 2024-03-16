@@ -12,9 +12,13 @@ import (
 )
 
 var (
-	ws = websocket.Upgrader{ReadBufferSize: 1024, WriteBufferSize: 1024, CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
+	ws = websocket.Upgrader{
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+		// websocket跨域
+		CheckOrigin: func(r *http.Request) bool {
+			return true
+		},
 	}
 	upgrade     *websocket.Conn
 	messageType int
@@ -23,7 +27,7 @@ var (
 )
 
 func New(c *gin.Context) {
-	upgrade, err := ws.Upgrade(c.Writer, c.Request, nil)
+	upgrade, err = ws.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		logger.Business.Error("websocket connection failed", zap.Error(err))
 		return
@@ -88,7 +92,11 @@ func SendMsg(ch chan *protocol.Protocol) {
 		}
 
 		//数据处理
-		bytes := service.Control(ptc.GetObjects())
+		bytes, err := service.Control(ptc.GetObjects())
+		if err != nil {
+			logger.Business.Error("data process failed", zap.Error(err))
+			return
+		}
 
 		//主动推送到前端
 		err = upgrade.WriteMessage(messageType, bytes)

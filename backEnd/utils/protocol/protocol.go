@@ -6,19 +6,19 @@ import (
 )
 
 type Protocol struct {
-	star      bool                    //协议控制
-	timestamp time.Duration           //协议时间戳
-	objects   *algorithm.ArrayObjects //协议数据
+	Star      bool                    `json:"star"`      //协议控制
+	Timestamp time.Duration           `json:"timestamp"` //协议时间戳
+	Objects   *algorithm.ArrayObjects `json:"Objects"`   //协议数据
 }
 
 func (p *Protocol) GetStar() bool {
-	return p.star
+	return p.Star
 }
 
 func (p *Protocol) GetTimestamp() time.Duration {
-	return p.timestamp
+	return p.Timestamp
 }
 
 func (p *Protocol) GetObjects() *algorithm.ArrayObjects {
-	return p.objects
+	return p.Objects
 }

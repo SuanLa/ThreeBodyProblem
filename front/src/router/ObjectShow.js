@@ -1,8 +1,13 @@
 import {Canvas} from "@react-three/fiber";
 import Object from "../view/Object";
-import {Button, ButtonGroup} from "@mui/material";
+import {Card, useTheme} from "@mui/material";
 import {useState} from "react";
 import {connect} from "../http/websocket";
+import IconButton from "@mui/material/IconButton";
+import Box from "@mui/material/Box";
+import SkipPreviousIcon from '@mui/icons-material/SkipPrevious';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import SkipNextIcon from '@mui/icons-material/SkipNext';
 
 let webSocket;
 
@@ -24,7 +29,7 @@ export default function Show(){
 
     // websocket连接后端
     const startRunning = () => {
-        const url = "ws://localhost:6750/v1/test";
+        const url = "ws://localhost:6750/v1/track";
         webSocket = connect(url, messageHandler);
         console.log(toggle);
         toggle = true;
@@ -39,26 +44,43 @@ export default function Show(){
         }
     }
 
-    const buttons = [
-        <Button key={"zuo"}> zuo </Button>,
-        <Button key={"||"} onClick={ toggle===true ? startRunning : stopRunning }>||</Button>,
-        <Button key={"you"}> you </Button>
-    ]
+    const theme = useTheme();
+
+    // const buttons = [
+    //     <Button key={"zuo"}> zuo </Button>,
+    //     <Button key={"||"} onClick={ toggle===true ? startRunning : stopRunning }>||</Button>,
+    //     <Button key={"you"}> you </Button>
+    // ]
 
     return (
         <div id="canvas-container">
             <Canvas>
                 {maps}
             </Canvas>
-            <ButtonGroup
-                color="secondary"
-                orientation="horizontal"
-                size="large"
-                variant="filled"
-                className={"btu-g"}
-            >
-                {buttons}
-            </ButtonGroup>
+            <Card sx={{ display: 'flex' }} className={"btu-g"}>
+                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', pl: 1, pb: 1 }}>
+                        <IconButton aria-label="previous">
+                            {theme.direction === 'rtl' ? <SkipNextIcon /> : <SkipPreviousIcon />}
+                        </IconButton>
+                        <IconButton aria-label="play/pause">
+                            <PlayArrowIcon sx={{ height: 38, width: 38 }} onClick={ toggle===true ? startRunning : stopRunning }/>
+                        </IconButton>
+                        <IconButton aria-label="next">
+                            {theme.direction === 'rtl' ? <SkipPreviousIcon /> : <SkipNextIcon />}
+                        </IconButton>
+                    </Box>
+                </Box>
+            </Card>
+            {/*<ButtonGroup*/}
+            {/*    color="secondary"*/}
+            {/*    orientation="horizontal"*/}
+            {/*    size="large"*/}
+            {/*    variant="filled"*/}
+            {/*    className={"btu-g"}*/}
+            {/*>*/}
+            {/*    {buttons}*/}
+            {/*</ButtonGroup>*/}
         </div>
     )
 }

@@ -10,7 +10,7 @@
 
 .btu-g {
     position: absolute;
-    left: 500px;
+    left: 700px;
     bottom: 100px;
-    z-index: 3000;
+    z-index: 1;
 }

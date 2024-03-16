@@ -1,6 +1,6 @@
 import {Navigate, useRoutes} from "react-router-dom";
 import * as React from "react";
-import {Setting} from "./ObjSetting";
+import Setting from "./ObjSetting";
 import DashBoard from "../component/DashBoard";
 import Show from "./ObjectShow";
 import NotFound from "./Error";

@@ -23,3 +23,13 @@
         background-color: gold;
     }
 }
+
+.setContainer {
+    position: absolute;
+    height: 840px;
+    width: 1400px;
+    top: 100px;
+    left: 400px;
+    background-color: #a0ffd9;
+    border-radius: 20px;
+}

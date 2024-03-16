@@ -12,15 +12,19 @@ import (
 
 func WsHandler(c *gin.Context) {
 	ws.New(c)
-	ch := make(chan *protocol.Protocol)
+	// 使用带缓冲通道
+	ch := make(chan *protocol.Protocol, 100)
 	go ws.Rec(ch)
 	go ws.SendMsg(ch)
 }
 
 func TestHandler(c *gin.Context) {
-	wst := websocket.Upgrader{ReadBufferSize: 1024, WriteBufferSize: 1024, CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
+	wst := websocket.Upgrader{
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+		CheckOrigin: func(r *http.Request) bool {
+			return true
+		},
 	}
 	upgrade, err := wst.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
