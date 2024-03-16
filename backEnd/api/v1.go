@@ -15,8 +15,13 @@ func WsHandler(c *gin.Context) {
 
 	// 使用带缓冲通道
 	ch := make(chan *protocol.Protocol, 100)
-	go ws.Rec(ch)
+	st := make(chan bool)
+	go ws.Rec(ch, st)
 	go ws.SendMsg(ch)
+
+	if <-st {
+		return
+	}
 }
 
 func TestHandler(c *gin.Context) {

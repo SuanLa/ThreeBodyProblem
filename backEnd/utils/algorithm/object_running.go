@@ -7,18 +7,27 @@ import (
 	"strconv"
 )
 
-const GravitationalConstant = "6.67e-11"
+const GravitationalConstant = "6.67e-7"
 
 type ArrayObjects struct {
 	Objects []Object `json:"objects"`
 }
 
 func (ao ArrayObjects) Run() (ArrayObjects, error) {
-	for index, _ := range ao.Objects {
-		go running(index, ao)
+	newObjectArray := ArrayObjects{
+		Objects: make([]Object, len(ao.Objects)),
 	}
 
-	return ao, nil
+	for index, _ := range ao.Objects {
+		object, i, err := running(index, ao)
+		if err != nil {
+			logger.Business.Error("object running failed", zap.Any("ObjectArray", ao), zap.Any("index", index), zap.Any("object", object), zap.Error(err))
+			return ao, err
+		}
+		newObjectArray.Objects[i] = object
+	}
+
+	return newObjectArray, nil
 }
 
 func (ao *ArrayObjects) GetObjects() []Object {
@@ -60,9 +69,9 @@ func running(index int, ao ArrayObjects) (Object, int, error) {
 
 			// 计算并分解力
 			f := gc * res / d
-			fx := f * float64(object.Position.X-obj.Position.X) / d
-			fy := f * float64(object.Position.Y-obj.Position.Y) / d
-			fz := f * float64(object.Position.Z-obj.Position.Z) / d
+			fx := f * (object.Position.X - obj.Position.X) / d
+			fy := f * (object.Position.Y - obj.Position.Y) / d
+			fz := f * (object.Position.Z - obj.Position.Z) / d
 
 			q := float64(obj.Quality)
 			// 加速度
@@ -71,14 +80,17 @@ func running(index int, ao ArrayObjects) (Object, int, error) {
 			az := fz / q
 
 			// 速度
-			vx := ax * 1
+			vx := ax*1 + obj.Speed.XSpeed
 			vy := ay * 1
 			vz := az * 1
 
 			// 更新位置
-			obj.Update(int64(vx), int64(vy), int64(vz))
+			obj = obj.Update(vx, vy, vz)
 		}
 	}
+
+	// 更新时间
+	obj.Time++
 
 	return obj, index, nil
 }

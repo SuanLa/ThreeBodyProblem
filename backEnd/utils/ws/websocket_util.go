@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"
 	"net/http"
+	"time"
 )
 
 var (
@@ -42,7 +43,7 @@ func New(c *gin.Context) {
 	//}(upgrade)
 }
 
-func Rec(ch chan *protocol.Protocol) {
+func Rec(ch chan *protocol.Protocol, st chan bool) {
 	for {
 		messageType, p, err = upgrade.ReadMessage()
 		if err != nil {
@@ -50,7 +51,7 @@ func Rec(ch chan *protocol.Protocol) {
 			return
 		}
 
-		logger.Business.Info("msg", zap.String("msg", string(p)))
+		logger.Business.Info("msg", zap.String("receive message", string(p)))
 
 		var ptc *protocol.Protocol
 		// 解析前端传递的协议
@@ -62,9 +63,10 @@ func Rec(ch chan *protocol.Protocol) {
 
 		ch <- ptc
 
-		if !ptc.GetStar() {
+		if !ptc.Star {
 			logger.Business.Info("websocket connection close")
 			err = upgrade.Close()
+			st <- true
 			return
 		}
 	}
@@ -75,46 +77,79 @@ func SendMsg(ch chan *protocol.Protocol) {
 	var ptc *protocol.Protocol
 
 	for {
-		temp := <-ch
+		select {
+		case temp := <-ch:
+			if !temp.Star {
+				err := upgrade.Close()
+				if err != nil {
+					logger.Business.Error("websocket connection close failed", zap.Error(err))
+					return
+				}
 
-		if !temp.GetStar() {
-			err := upgrade.Close()
-			if err != nil {
-				logger.Business.Error("websocket connection close failed", zap.Error(err))
+				logger.Business.Info("websocket connection close")
 				return
 			}
 
-			logger.Business.Info("websocket connection close")
-			return
+			if temp != nil {
+				ptc = temp
+				logger.Business.Info("data update", zap.Any("old data", ptc), zap.Any("new data", temp))
+			}
+
+			//数据处理
+			ao, err := service.Control(ptc.Objects)
+			if err != nil {
+				logger.Business.Error("data process failed", zap.Error(err))
+				return
+			}
+
+			ptc.Timestamp = time.Now().Unix()
+			ptc.Objects = &ao
+
+			bytes, err := json.Marshal(ptc)
+			if err != nil {
+				logger.Business.Error("data marshal failed", zap.Error(err))
+				return
+			}
+
+			logger.Business.Info("data send", zap.Any("data", ptc))
+
+			//主动推送到前端
+			err = upgrade.WriteMessage(messageType, bytes)
+			if err != nil {
+				logger.Business.Error("websocket connection write failed", zap.Error(err))
+				return
+			}
+
+		default:
+			if ptc != nil {
+				//数据处理
+				ao, err := service.Control(ptc.Objects)
+				if err != nil {
+					logger.Business.Error("data process failed", zap.Error(err))
+					return
+				}
+
+				ptc.Timestamp = time.Now().Unix()
+				ptc.Objects = &ao
+
+				bytes, err := json.Marshal(ptc)
+				if err != nil {
+					logger.Business.Error("data marshal failed", zap.Error(err))
+					return
+				}
+
+				logger.Business.Info("data send", zap.Any("data", ptc))
+
+				//主动推送到前端
+				err = upgrade.WriteMessage(messageType, bytes)
+				if err != nil {
+					logger.Business.Error("websocket connection write failed", zap.Error(err))
+					return
+				}
+			}
 		}
 
-		if temp != nil {
-			ptc = temp
-			logger.Business.Info("data update", zap.Any("old data", ptc), zap.Any("new data", temp))
-		}
-
-		//数据处理
-		ao, err := service.Control(ptc.GetObjects())
-		if err != nil {
-			logger.Business.Error("data process failed", zap.Error(err))
-			return
-		}
-
-		ptc.Objects = &ao
-
-		bytes, err := json.Marshal(ptc)
-		if err != nil {
-			logger.Business.Error("data marshal failed", zap.Error(err))
-			return
-		}
-
-		logger.Business.Info("data send", zap.Any("data", ptc))
-
-		//主动推送到前端
-		err = upgrade.WriteMessage(messageType, bytes)
-		if err != nil {
-			logger.Business.Error("websocket connection write failed", zap.Error(err))
-			return
-		}
+		// 休眠一秒
+		time.Sleep(1 * time.Second)
 	}
 }
