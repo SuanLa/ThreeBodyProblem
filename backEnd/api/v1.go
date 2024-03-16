@@ -12,6 +12,7 @@ import (
 
 func WsHandler(c *gin.Context) {
 	ws.New(c)
+
 	// 使用带缓冲通道
 	ch := make(chan *protocol.Protocol, 100)
 	go ws.Rec(ch)

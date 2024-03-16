@@ -32,14 +32,14 @@ func New(c *gin.Context) {
 		logger.Business.Error("websocket connection failed", zap.Error(err))
 		return
 	}
-
-	defer func(upgrade *websocket.Conn) {
-		err := upgrade.Close()
-		if err != nil {
-			logger.Business.Error("websocket connection close failed", zap.Error(err))
-			return
-		}
-	}(upgrade)
+	//
+	//defer func(upgrade *websocket.Conn) {
+	//	err := upgrade.Close()
+	//	if err != nil {
+	//		logger.Business.Error("websocket connection close failed", zap.Error(err))
+	//		return
+	//	}
+	//}(upgrade)
 }
 
 func Rec(ch chan *protocol.Protocol) {
@@ -78,11 +78,13 @@ func SendMsg(ch chan *protocol.Protocol) {
 		temp := <-ch
 
 		if !temp.GetStar() {
-			logger.Business.Info("websocket connection close")
 			err := upgrade.Close()
 			if err != nil {
+				logger.Business.Error("websocket connection close failed", zap.Error(err))
 				return
 			}
+
+			logger.Business.Info("websocket connection close")
 			return
 		}
 
@@ -92,11 +94,21 @@ func SendMsg(ch chan *protocol.Protocol) {
 		}
 
 		//数据处理
-		bytes, err := service.Control(ptc.GetObjects())
+		ao, err := service.Control(ptc.GetObjects())
 		if err != nil {
 			logger.Business.Error("data process failed", zap.Error(err))
 			return
 		}
+
+		ptc.Objects = &ao
+
+		bytes, err := json.Marshal(ptc)
+		if err != nil {
+			logger.Business.Error("data marshal failed", zap.Error(err))
+			return
+		}
+
+		logger.Business.Info("data send", zap.Any("data", ptc))
 
 		//主动推送到前端
 		err = upgrade.WriteMessage(messageType, bytes)

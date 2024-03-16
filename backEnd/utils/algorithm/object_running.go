@@ -2,7 +2,6 @@ package algorithm
 
 import (
 	"backEnd/utils/logger"
-	"encoding/json"
 	"go.uber.org/zap"
 	"math"
 	"strconv"
@@ -14,18 +13,12 @@ type ArrayObjects struct {
 	Objects []Object `json:"objects"`
 }
 
-func (ao ArrayObjects) Run() ([]byte, error) {
+func (ao ArrayObjects) Run() (ArrayObjects, error) {
 	for index, _ := range ao.Objects {
 		go running(index, ao)
 	}
 
-	marshal, err := json.Marshal(ao)
-	if err != nil {
-		logger.Business.Error("json.Marshal failed", zap.Any("ObjectArray", ao), zap.Error(err))
-		return nil, err
-	}
-
-	return marshal, nil
+	return ao, nil
 }
 
 func (ao *ArrayObjects) GetObjects() []Object {

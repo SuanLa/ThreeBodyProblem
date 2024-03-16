@@ -4,8 +4,8 @@ import (
 	"backEnd/utils/algorithm"
 )
 
-func Control(objects *algorithm.ArrayObjects) ([]byte, error) {
-	bytes, err := objects.Run()
+func Control(objects *algorithm.ArrayObjects) (algorithm.ArrayObjects, error) {
+	ao, err := objects.Run()
 
-	return bytes, err
+	return ao, err
 }
