@@ -7,7 +7,7 @@ export function connect(url, msg,handlerMessage) {
     };
 
     ws.onmessage = (event) => {
-        console.log(event)
+        // console.log(event)
         handlerMessage(event.data)
     };
 

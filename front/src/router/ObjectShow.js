@@ -68,15 +68,12 @@ export default function Show(){
 
     const [objs, setObjs] = useState(arr);
 
-    const maps = objs.Objects.objects.map(
-        object => <Object key={object.Quality} position={object.Position}/>
-    )
-
     // websocket回调函数
     function messageHandler(message){
-        // console.log("=>"+message)
         let parse = JSON.parse(message);
+        console.log(parse)
         setObjs(parse);
+        // console.log(objs)
     }
 
     // websocket连接后端
@@ -108,7 +105,7 @@ export default function Show(){
     return (
         <div id="canvas-container">
             <Canvas>
-                {maps}
+                {objs.Objects.objects.map((object, index) => <Object key={index} position={object.Position}/>)}
             </Canvas>
             <Card sx={{ display: 'flex' }} className={"btu-g"}>
                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>

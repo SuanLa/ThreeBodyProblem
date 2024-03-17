@@ -8,6 +8,9 @@ import img_5 from "./../img/img_5.png"
 import {useEffect, useRef} from "react";
 
 export default function Object({position}){
+    useEffect(()=>{
+        console.log(position)
+    },[position])
 
     const [colorMap, specularMap, normalMap] = useLoader(TextureLoader, [img_1, img_6, img_5])
     const myMesh = useRef()
