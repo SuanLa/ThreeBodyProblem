@@ -8,9 +8,6 @@ import img_5 from "./../img/img_5.png"
 import {useEffect, useRef} from "react";
 
 export default function Object({position}){
-    useEffect(() => {
-        console.log(position[0])
-    }, [position]);
 
     const [colorMap, specularMap, normalMap] = useLoader(TextureLoader, [img_1, img_6, img_5])
     const myMesh = useRef()
@@ -25,7 +22,7 @@ export default function Object({position}){
             <directionalLight position={[1,1,1]}/>
             <mesh
                 onClick={(e) => console.log(position)}
-                position={position[0]}
+                position={[position.X,position.Y,position.Z]}
                 ref={myMesh}
             >
                 <sphereGeometry/>

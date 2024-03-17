@@ -15,22 +15,75 @@ let webSocket;
 let toggle = true;
 
 export default function Show(){
-    const [objs, setObjs] = useState([]);
+    let arr = {
+        "Star": true,
+        "Timestamp": 1710576277,
+        "Objects":{
+            "objects": [
+                {
+                    "Quality": 10001,
+                    "Position": {
+                        "X": 1,
+                        "Y": 2,
+                        "Z": 1
+                    },
+                    "Speed": {
+                        "XSpeed": 10,
+                        "YSpeed": 10,
+                        "ZSpeed": 10
+                    },
+                    "Time": 0
+                },
+                {
+                    "Quality": 10002,
+                    "Position": {
+                        "X": -1,
+                        "Y": 10,
+                        "Z": 0
+                },
+                "Speed": {
+                    "XSpeed": 10,
+                    "YSpeed": 10,
+                    "ZSpeed": 10
+                },
+                "Time": 0
+                },
+                {
+                    "Quality": 10003,
+                    "Position": {
+                        "X": 2,
+                        "Y": 0,
+                        "Z": -10
+                },
+                "Speed": {
+                    "XSpeed": 10,
+                    "YSpeed": 10,
+                    "ZSpeed": 10
+                },
+                "Time": 0
+                }
+            ]
+        }
+    }
 
-    const maps = objs.map(
-        object => <Object position={object.psi}/>
+    const [objs, setObjs] = useState(arr);
+
+    const maps = objs.Objects.objects.map(
+        object => <Object key={object.Quality} position={object.Position}/>
     )
 
     // websocket回调函数
     function messageHandler(message){
-        console.log(message)
-        setObjs(message.data);
+        // console.log("=>"+message)
+        let parse = JSON.parse(message);
+        setObjs(parse);
     }
 
     // websocket连接后端
     const startRunning = () => {
         const url = "ws://localhost:6750/v1/track";
-        webSocket = connect(url, messageHandler);
+        let stringify = JSON.stringify(objs);
+        webSocket = connect(url, stringify, messageHandler);
         console.log(toggle);
         toggle = true;
     }

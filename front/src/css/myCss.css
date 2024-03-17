@@ -26,10 +26,17 @@
 
 .setContainer {
     position: absolute;
-    height: 840px;
+    height: 840px !important;
     width: 1400px;
     top: 100px;
     left: 400px;
-    background-color: #a0ffd9;
     border-radius: 20px;
+}
+
+.meituan {
+    height: 840px;
+}
+
+.slid {
+    margin: 0 10px 0 10px;
 }

@@ -1,25 +1,22 @@
 
-export function connect(url, handlerMessage) {
+export function connect(url, msg,handlerMessage) {
     const ws = new WebSocket(url);
 
     ws.onopen = () => {
-        ws.send("ping");
+        ws.send(msg);
     };
 
     ws.onmessage = (event) => {
-        if (event.data !== "pong"){
-            ws.close();
-        }else {
-            handlerMessage(event.data)
-        }
+        console.log(event)
+        handlerMessage(event.data)
     };
 
     ws.onclose = (event) => {
-        console.log(event.data);
+        console.log(event);
     };
 
     ws.onerror = (event) => {
-        console.log(event.data);
+        console.log(event);
     };
 
     return ws
