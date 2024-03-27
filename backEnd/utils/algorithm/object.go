@@ -25,16 +25,26 @@ type Position struct {
 }
 
 // 每秒更新物体位置的方法
-func (o Object) Update(vx, vy, vz float64) Object {
+func (o Object) Update(ax, ay, az float64) Object {
+	// 计算末速度
+	vx := o.Speed.XSpeed + ax*Time
+	vy := o.Speed.YSpeed + ay*Time
+	vz := o.Speed.ZSpeed + az*Time
+
+	// 计算平均速度
+	avgX := (vx + o.Speed.XSpeed) / 2
+	avgY := (vy + o.Speed.YSpeed) / 2
+	avgZ := (vz + o.Speed.ZSpeed) / 2
+
 	// 更新速度
 	o.Speed.XSpeed = vx
 	o.Speed.YSpeed = vy
 	o.Speed.ZSpeed = vz
 
-	// 更新物体的位置、质量和方向
-	o.Position.X += o.Speed.XSpeed
-	o.Position.Y += o.Speed.YSpeed
-	o.Position.Z += o.Speed.ZSpeed
+	// 更新物体的位置
+	o.Position.X += avgX * Time
+	o.Position.Y += avgY * Time
+	o.Position.Z += avgZ * Time
 
 	return o
 }

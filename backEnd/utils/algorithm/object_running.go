@@ -9,7 +9,7 @@ import (
 
 const (
 	GravitationalConstant = "6.67e-7"
-	Time                  = 1 * 60 * 60
+	Time                  = 1
 )
 
 type ArrayObjects struct {
@@ -68,10 +68,11 @@ func running(index int, ao ArrayObjects) (Object, int, error) {
 				return obj, index, err
 			}
 
+			// 质量之积
 			messSum := float64(obj.Mess * object.Mess)
 
 			// 计算并分解力
-			f := gc * messSum / d
+			f := gc * messSum / (d * d)
 			fx := f * (object.Position.X - obj.Position.X) / d
 			fy := f * (object.Position.Y - obj.Position.Y) / d
 			fz := f * (object.Position.Z - obj.Position.Z) / d
@@ -82,13 +83,8 @@ func running(index int, ao ArrayObjects) (Object, int, error) {
 			ay := fy / m
 			az := fz / m
 
-			// 平均速度
-			vx := ax * Time
-			vy := ay * Time
-			vz := az * Time
-
-			// 更新位置
-			obj = obj.Update(vx, vy, vz)
+			// 更新位置和速度
+			obj = obj.Update(ax, ay, az)
 		}
 	}
 
@@ -104,5 +100,5 @@ func distance(obj1, obj2 Object) float64 {
 	dy := (obj2.Position.Y - obj1.Position.Y) * (obj2.Position.Y - obj1.Position.Y)
 	dz := (obj2.Position.Z - obj1.Position.Z) * (obj2.Position.Z - obj1.Position.Z)
 
-	return math.Sqrt(float64(dx + dy + dz))
+	return math.Sqrt(dx + dy + dz)
 }

@@ -146,10 +146,10 @@ func SendMsg(ch chan *protocol.Protocol) {
 					logger.Business.Error("websocket connection write failed", zap.Error(err))
 					return
 				}
+
+				// 休眠
+				time.Sleep(time.Duration(ptc.SleepTime) * time.Second)
 			}
 		}
-
-		// 休眠
-		time.Sleep(time.Duration(30 * ptc.SleepTime))
 	}
 }

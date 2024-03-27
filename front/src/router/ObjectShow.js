@@ -1,13 +1,15 @@
-import {Canvas} from "@react-three/fiber";
+import {Canvas, extend, useThree} from "@react-three/fiber";
 import Object from "../view/Object";
 import {Card, useTheme} from "@mui/material";
-import {useState} from "react";
+import {useRef, useState} from "react";
 import {connect} from "../http/websocket";
 import IconButton from "@mui/material/IconButton";
 import Box from "@mui/material/Box";
 import SkipPreviousIcon from '@mui/icons-material/SkipPrevious';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import SkipNextIcon from '@mui/icons-material/SkipNext';
+import Controls from "../view/Control";
+
 
 let webSocket;
 
@@ -21,44 +23,44 @@ export default function Show(){
         "Objects":{
             "objects": [
                 {
-                    "Mess": 10001,
+                    "Mess": 10000,
                     "Position": {
                         "X": 1,
                         "Y": 2,
                         "Z": 1
                     },
                     "Speed": {
-                        "XSpeed": 10,
-                        "YSpeed": 10,
-                        "ZSpeed": 10
+                        "XSpeed": 1,
+                        "YSpeed": 1,
+                        "ZSpeed": 1
                     },
                     "Time": 0
                 },
                 {
-                    "Mess": 10002,
+                    "Mess": 10000,
                     "Position": {
                         "X": -1,
                         "Y": 1,
                         "Z": 0
                 },
                 "Speed": {
-                    "XSpeed": 10,
-                    "YSpeed": 10,
-                    "ZSpeed": 10
+                    "XSpeed": 1,
+                    "YSpeed": -1,
+                    "ZSpeed": -1
                 },
                 "Time": 0
                 },
                 {
-                    "Mess": 10003,
+                    "Mess": 10000,
                     "Position": {
                         "X": 2,
                         "Y": 0,
                         "Z": -6
                 },
                 "Speed": {
-                    "XSpeed": 10,
-                    "YSpeed": 10,
-                    "ZSpeed": 10
+                    "XSpeed": 0,
+                    "YSpeed": 1,
+                    "ZSpeed": 0
                 },
                 "Time": 0
                 }
@@ -72,7 +74,7 @@ export default function Show(){
     // websocket回调函数
     function messageHandler(message){
         let parse = JSON.parse(message);
-        console.log(parse)
+        // console.log(parse)
         setObjs(parse);
         // console.log(objs)
     }
@@ -83,7 +85,7 @@ export default function Show(){
         let stringify = JSON.stringify(objs);
         webSocket = connect(url, stringify, messageHandler);
         console.log(toggle);
-        toggle = true;
+        toggle = false;
     }
 
     // websocket断开连接
@@ -91,7 +93,7 @@ export default function Show(){
         if (webSocket !== null){
             webSocket.close();
             console.log(toggle);
-            toggle = false;
+            toggle = true;
         }
     }
 
@@ -107,8 +109,9 @@ export default function Show(){
         <div id="canvas-container">
             <Canvas>
                 {objs.Objects.objects.map((object, index) => <Object key={index} position={object.Position}/>)}
+                <Controls/>
             </Canvas>
-            <Card sx={{ display: 'flex' }} className={"btu-g"}>
+            <Card sx={{display: 'flex'}} className={"btu-g"}>
                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', pl: 1, pb: 1 }}>
                         <IconButton aria-label="previous">
