@@ -15,11 +15,11 @@
 .choiceBar {
     width: 220px;
     font-size: 50px;
+    text-decoration: none;
     border-radius: 15px;
     padding: 10px;
 
     &:hover {
-
         background-color: gold;
     }
 }

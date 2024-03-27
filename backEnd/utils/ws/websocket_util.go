@@ -24,13 +24,13 @@ var (
 	upgrade     *websocket.Conn
 	messageType int
 	p           []byte
-	err         error
+	wsErr       error
 )
 
 func New(c *gin.Context) {
-	upgrade, err = ws.Upgrade(c.Writer, c.Request, nil)
-	if err != nil {
-		logger.Business.Error("websocket connection failed", zap.Error(err))
+	upgrade, wsErr = ws.Upgrade(c.Writer, c.Request, nil)
+	if wsErr != nil {
+		logger.Business.Error("websocket connection failed", zap.Error(wsErr))
 		return
 	}
 	//
@@ -45,9 +45,9 @@ func New(c *gin.Context) {
 
 func Rec(ch chan *protocol.Protocol, st chan bool) {
 	for {
-		messageType, p, err = upgrade.ReadMessage()
-		if err != nil {
-			logger.Business.Error("websocket connection read failed", zap.Error(err))
+		messageType, p, wsErr = upgrade.ReadMessage()
+		if wsErr != nil {
+			logger.Business.Error("websocket connection read failed", zap.Error(wsErr))
 			return
 		}
 
@@ -55,7 +55,7 @@ func Rec(ch chan *protocol.Protocol, st chan bool) {
 
 		var ptc *protocol.Protocol
 		// 解析前端传递的协议
-		err = json.Unmarshal(p, &ptc)
+		err := json.Unmarshal(p, &ptc)
 		if err != nil {
 			logger.Business.Error("websocket connection read failed", zap.Error(err))
 			return
@@ -92,7 +92,7 @@ func SendMsg(ch chan *protocol.Protocol) {
 
 			if temp != nil {
 				ptc = temp
-				logger.Business.Info("data update", zap.Any("old data", ptc), zap.Any("new data", temp))
+				logger.Business.Info("receive data update", zap.Any("old data", ptc), zap.Any("new data", temp))
 			}
 
 			//数据处理
@@ -149,7 +149,7 @@ func SendMsg(ch chan *protocol.Protocol) {
 			}
 		}
 
-		// 休眠一秒
-		time.Sleep(1 * time.Second)
+		// 休眠
+		time.Sleep(time.Duration(30 * ptc.SleepTime))
 	}
 }

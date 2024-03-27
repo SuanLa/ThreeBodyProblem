@@ -4,7 +4,7 @@ import "math"
 
 // 定义一个物体结构体
 type Object struct {
-	Quality  uint64   `json:"Quality"`
+	Mess     uint64   `json:"Mess"`
 	Position Position `json:"Position"`
 	Speed    Speed    `json:"Speed"`
 	Time     uint64   `json:"Time"`

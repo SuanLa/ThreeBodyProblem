@@ -7,7 +7,10 @@ import (
 	"strconv"
 )
 
-const GravitationalConstant = "6.67e-7"
+const (
+	GravitationalConstant = "6.67e-7"
+	Time                  = 1 * 60 * 60
+)
 
 type ArrayObjects struct {
 	Objects []Object `json:"objects"`
@@ -65,24 +68,24 @@ func running(index int, ao ArrayObjects) (Object, int, error) {
 				return obj, index, err
 			}
 
-			res := float64(obj.Quality * object.Quality)
+			messSum := float64(obj.Mess * object.Mess)
 
 			// 计算并分解力
-			f := gc * res / d
+			f := gc * messSum / d
 			fx := f * (object.Position.X - obj.Position.X) / d
 			fy := f * (object.Position.Y - obj.Position.Y) / d
 			fz := f * (object.Position.Z - obj.Position.Z) / d
 
-			q := float64(obj.Quality)
+			m := float64(obj.Mess)
 			// 加速度
-			ax := fx / q
-			ay := fy / q
-			az := fz / q
+			ax := fx / m
+			ay := fy / m
+			az := fz / m
 
-			// 速度
-			vx := ax*1 + obj.Speed.XSpeed
-			vy := ay * 1
-			vz := az * 1
+			// 平均速度
+			vx := ax * Time
+			vy := ay * Time
+			vz := az * Time
 
 			// 更新位置
 			obj = obj.Update(vx, vy, vz)

@@ -21,7 +21,7 @@ export default function Show(){
         "Objects":{
             "objects": [
                 {
-                    "Quality": 10001,
+                    "Mess": 10001,
                     "Position": {
                         "X": 1,
                         "Y": 2,
@@ -35,10 +35,10 @@ export default function Show(){
                     "Time": 0
                 },
                 {
-                    "Quality": 10002,
+                    "Mess": 10002,
                     "Position": {
                         "X": -1,
-                        "Y": 10,
+                        "Y": 1,
                         "Z": 0
                 },
                 "Speed": {
@@ -49,11 +49,11 @@ export default function Show(){
                 "Time": 0
                 },
                 {
-                    "Quality": 10003,
+                    "Mess": 10003,
                     "Position": {
                         "X": 2,
                         "Y": 0,
-                        "Z": -10
+                        "Z": -6
                 },
                 "Speed": {
                     "XSpeed": 10,
@@ -63,7 +63,8 @@ export default function Show(){
                 "Time": 0
                 }
             ]
-        }
+        },
+        "SleepTime":1
     }
 
     const [objs, setObjs] = useState(arr);
