@@ -1,14 +1,14 @@
-import {Canvas, extend, useThree} from "@react-three/fiber";
-import Object from "../view/Object";
+import {Canvas} from "@react-three/fiber";
+import Object from "../component/Object";
 import {Card, useTheme} from "@mui/material";
-import {useRef, useState} from "react";
+import {useState} from "react";
 import {connect} from "../http/websocket";
 import IconButton from "@mui/material/IconButton";
 import Box from "@mui/material/Box";
 import SkipPreviousIcon from '@mui/icons-material/SkipPrevious';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import SkipNextIcon from '@mui/icons-material/SkipNext';
-import Controls from "../view/Control";
+import Controls from "../component/Control";
 
 
 let webSocket;
@@ -17,59 +17,14 @@ let webSocket;
 let toggle = true;
 
 export default function Show(){
-    let arr = {
-        "Star": true,
-        "Timestamp": 1710576277,
-        "Objects":{
-            "objects": [
-                {
-                    "Mess": 10000,
-                    "Position": {
-                        "X": 1,
-                        "Y": 2,
-                        "Z": 1
-                    },
-                    "Speed": {
-                        "XSpeed": 1,
-                        "YSpeed": 1,
-                        "ZSpeed": 1
-                    },
-                    "Time": 0
-                },
-                {
-                    "Mess": 10000,
-                    "Position": {
-                        "X": -1,
-                        "Y": 1,
-                        "Z": 0
-                },
-                "Speed": {
-                    "XSpeed": 1,
-                    "YSpeed": -1,
-                    "ZSpeed": -1
-                },
-                "Time": 0
-                },
-                {
-                    "Mess": 10000,
-                    "Position": {
-                        "X": 2,
-                        "Y": 0,
-                        "Z": -6
-                },
-                "Speed": {
-                    "XSpeed": 0,
-                    "YSpeed": 1,
-                    "ZSpeed": 0
-                },
-                "Time": 0
-                }
-            ]
-        },
-        "SleepTime":1
+
+    // 初始化组件
+    function init(){
+        let obj = sessionStorage.getItem("protocol");
+        return JSON.parse(obj);
     }
 
-    const [objs, setObjs] = useState(arr);
+    const [objs, setObjs] = useState(init);
 
     // websocket回调函数
     function messageHandler(message){
@@ -99,12 +54,6 @@ export default function Show(){
 
     const theme = useTheme();
 
-    // const buttons = [
-    //     <Button key={"zuo"}> zuo </Button>,
-    //     <Button key={"||"} onClick={ toggle===true ? startRunning : stopRunning }>||</Button>,
-    //     <Button key={"you"}> you </Button>
-    // ]
-
     return (
         <div id="canvas-container">
             <Canvas>
@@ -126,15 +75,6 @@ export default function Show(){
                     </Box>
                 </Box>
             </Card>
-            {/*<ButtonGroup*/}
-            {/*    color="secondary"*/}
-            {/*    orientation="horizontal"*/}
-            {/*    size="large"*/}
-            {/*    variant="filled"*/}
-            {/*    className={"btu-g"}*/}
-            {/*>*/}
-            {/*    {buttons}*/}
-            {/*</ButtonGroup>*/}
         </div>
     )
 }

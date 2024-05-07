@@ -26,8 +26,8 @@
 
 .setContainer {
     position: absolute;
-    height: 840px !important;
-    width: 1400px;
+    height: 600px !important;
+    width: 800px;
     top: 100px;
     left: 400px;
     border-radius: 20px;

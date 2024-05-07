@@ -148,7 +148,7 @@ func SendMsg(ch chan *protocol.Protocol) {
 				}
 
 				// 休眠
-				time.Sleep(time.Duration(ptc.SleepTime) * time.Second)
+				time.Sleep(time.Duration(10*ptc.SleepTime) * time.Millisecond)
 			}
 		}
 	}

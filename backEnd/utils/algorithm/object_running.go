@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	GravitationalConstant = "6.67e-7"
+	GravitationalConstant = "6.67e-8"
 	Time                  = 1
 )
 
@@ -78,6 +78,7 @@ func running(index int, ao ArrayObjects) (Object, int, error) {
 			fz := f * (object.Position.Z - obj.Position.Z) / d
 
 			m := float64(obj.Mess)
+
 			// 加速度
 			ax := fx / m
 			ay := fy / m

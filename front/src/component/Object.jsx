@@ -1,10 +1,10 @@
 import {useFrame, useLoader} from "@react-three/fiber";
-import "./../css/Object.css";
+import "../css/Object.css";
 import {TextureLoader} from "three";
 
-import img_1 from "./../img/img_1.png"
-import img_6 from "./../img/img_6.png"
-import img_5 from "./../img/img_5.png"
+import img_1 from "../img/img_1.png"
+import img_6 from "../img/img_6.png"
+import img_5 from "../img/img_5.png"
 import {useEffect, useRef} from "react";
 
 export default function Object({position}){
@@ -16,7 +16,7 @@ export default function Object({position}){
     const myMesh = useRef()
 
     useFrame(() => {
-        myMesh.current.rotation.y += 0.01
+        myMesh.current.rotation.y += 0.001
         myMesh.current.position.x = position.X
         myMesh.current.position.y = position.Y
         myMesh.current.position.z = position.Z
