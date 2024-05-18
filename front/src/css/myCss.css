@@ -20,16 +20,20 @@
     padding: 10px;
 
     &:hover {
-        background-color: gold;
+        background-color: rgba(120, 10, 100, 50%);
+    }
+
+    &:active {
+        background-color: rgba(120, 10, 100, 50%);
     }
 }
 
 .setContainer {
     position: absolute;
-    height: 600px !important;
-    width: 800px;
-    top: 100px;
-    left: 400px;
+    height: calc(70%) !important;
+    width: calc(50%);
+    top: calc(15%);
+    left: calc(25%);
     border-radius: 20px;
 }
 

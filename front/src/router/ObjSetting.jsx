@@ -240,7 +240,7 @@ export default function Setting() {
     function calculateVelocity(index){
 
         if (objArr.length===3){
-            let F = 0;
+            let force = 0;
             for (let i = 0; i < objArr.length; i++) {
                 if(i!==index){
                     let messSum = objArr[index].Mess * objArr[i].Mess;
@@ -251,12 +251,12 @@ export default function Setting() {
                     // 两个物体间的万有引力
                     let temp = G * messSum / (d * d);
 
-                    F += temp / (d/r);
+                    force += temp / (d/r);
                 }
             }
 
             // 返回逃逸速度
-            return F/objArr[index].Mess * r;
+            return force / objArr[index].Mess * r;
         }else {
             return 0;
         }
@@ -320,9 +320,18 @@ export default function Setting() {
                 <Tab label="物体二" {...a11yProps(1)} />
                 <Tab label="物体三" {...a11yProps(2)} />
             </Tabs>
-            <SettingPanel value={value} index={0} velocity={[velocity - velocity/2, velocity + velocity/2]} callback={callBackFuc}/>
-            <SettingPanel value={value} index={1} velocity={[velocity - velocity/2, velocity + velocity/2]} callback={callBackFuc}/>
-            <SettingPanel value={value} index={2} velocity={[velocity - velocity/2, velocity + velocity/2]} callback={callBackFuc}/>
+            <SettingPanel value={value}
+                          index={0}
+                          velocity={[velocity - velocity/2, velocity + velocity/2]}
+                          callback={callBackFuc}/>
+            <SettingPanel value={value}
+                          index={1}
+                          velocity={[velocity - velocity/2, velocity + velocity/2]}
+                          callback={callBackFuc}/>
+            <SettingPanel value={value}
+                          index={2}
+                          velocity={[velocity - velocity/2, velocity + velocity/2]}
+                          callback={callBackFuc}/>
         </Box>
     );
 }

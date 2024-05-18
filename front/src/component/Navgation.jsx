@@ -8,7 +8,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 
 import "../css/App.css";
 
-export default function Navigation() {
+export default function Navigation({chargeOpen}) {
 
     return (
         <Box sx={{ flexGrow: 1 }}>
@@ -21,7 +21,7 @@ export default function Navigation() {
                         aria-label="open drawer"
                         sx={{ mr: 2 }}
                     >
-                        <MenuIcon onClick={(e)=>(console.log("aaa"))}/>
+                        <MenuIcon onClick={chargeOpen}/>
                     </IconButton>
                     <Typography
                         variant="h6"
