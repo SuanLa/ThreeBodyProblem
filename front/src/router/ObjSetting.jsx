@@ -148,6 +148,53 @@ export default function Setting() {
     // 外接圆半径
     let r;
 
+    let circumCenter;
+
+    let objsRang = [[0, 0], [0 ,0], [0, 0]];
+
+
+    const [objArr, setObjArr] = useState([{
+            Mess: 10000,
+            Position: {
+                X: 1,
+                Y: -2,
+                Z: 3
+            },
+            Speed: {
+                XSpeed: 0,
+                YSpeed: 0,
+                ZSpeed: 0
+            },
+            Time: 0
+        }, {
+            Mess: 10000,
+            Position: {
+                X: 1,
+                Y: 1,
+                Z: 1
+            },
+            Speed: {
+                XSpeed: 0,
+                YSpeed: 0,
+                ZSpeed: 0
+            },
+            Time: 0
+        }, {
+            Mess: 10000,
+            Position: {
+                X: -1,
+                Y: -2,
+                Z: 0
+            },
+            Speed: {
+                XSpeed: 0,
+                YSpeed: 0,
+                ZSpeed: 0
+            },
+            Time: 0
+        }]
+    )
+
     // 计算向量的叉积
     function crossProduct(a, b) {
         return [
@@ -157,34 +204,6 @@ export default function Setting() {
         ];
     }
 
-    // 数据初始化
-    const calculateCircumcenter =  (arr) => {
-        // 计算三角形的法向量
-        let edge1 = [arr[1].Position.X - arr[0].Position.X, arr[1].Position.Y - arr[0].Position.Y, arr[1].Position.Z - arr[1].Position.Z];
-        let edge2 = [arr[2].Position.X - arr[0].Position.X, arr[2].Position.Y - arr[0].Position.Y, arr[2].Position.Z - arr[0].Position.Z];
-        let normal = crossProduct(edge1, edge2);
-
-        // 计算三边的中点
-        let midPoint1 = [(arr[0] + arr[1]) / 2, (arr[0] + arr[1]) / 2, (arr[0] + arr[1]) / 2];
-        let midPoint2 = [(arr[1] + arr[2]) / 2, (arr[1] + arr[2]) / 2, (arr[1] + arr[2]) / 2];
-
-        // 计算外接圆的圆心
-        let circumcenter = crossProduct(normal, crossProduct(midPoint1, midPoint2));
-
-        // 求出外接圆的半径
-        r = Math.sqrt((circumcenter[0]-arr[0].Position.X)*(circumcenter[0]-arr[0].Position.X) +
-            (circumcenter[1]-arr[0].Position.Y) * (circumcenter[1]-arr[0].Position.Y) +
-            (circumcenter[2]-arr[0].Position.Z) * (circumcenter[2]-arr[0].Position.Z));
-
-        for (let i = 0; i < 3; i++) {
-            let toVector = solveLinearEquations(pointsToVector(objArr[i], circumcenter), normal, objArr[i]);
-            let speed = velocityMarshal(velocity, toVector);
-            objArr[i].Speed.XSpeed = speed[0];
-            objArr[i].Speed.YSpeed = speed[1];
-            objArr[i].Speed.ZSpeed = speed[2];
-        }
-    }
-
     // 将两个三维点转化为向量
     function pointsToVector(point1, point2) {
         // 计算差值
@@ -192,10 +211,10 @@ export default function Setting() {
         let deltaY = point2[1] - point1[1];
         let deltaZ = point2[2] - point1[2];
 
-        // 构建向量
-        let vector = [deltaX, deltaY, deltaZ];
-        return vector;
+        // 返回构建向量
+        return [deltaX, deltaY, deltaZ];
     }
+
 
     // 外积法
     function solveLinearEquations(vector1, vector2, point) {
@@ -236,7 +255,37 @@ export default function Setting() {
         return result;
     }
 
-    // 速度范围计算
+    // 数据初始化
+    const calculateCircumcenter =  (objArr) => {
+        // 计算三角形的法向量
+        let edge1 = [objArr[1].Position.X - objArr[0].Position.X, objArr[1].Position.Y - objArr[0].Position.Y, objArr[1].Position.Z - objArr[1].Position.Z];
+        let edge2 = [objArr[2].Position.X - objArr[0].Position.X, objArr[2].Position.Y - objArr[0].Position.Y, objArr[2].Position.Z - objArr[0].Position.Z];
+        let normal = crossProduct(edge1, edge2);
+        console.log(normal)
+
+        // 计算三边的中点
+        let midPoint1 = [(objArr[0] + objArr[1]) / 2, (objArr[0] + objArr[1]) / 2, (objArr[0] + objArr[1]) / 2];
+        let midPoint2 = [(objArr[1] + objArr[2]) / 2, (objArr[1] + objArr[2]) / 2, (objArr[1] + objArr[2]) / 2];
+
+        // 计算外接圆的圆心
+        circumCenter = crossProduct(normal, crossProduct(midPoint1, midPoint2));
+        console.log(circumCenter)
+
+        // 求出外接圆的半径
+        r = Math.sqrt((circumCenter[0]-objArr[0].Position.X)*(circumCenter[0]-objArr[0].Position.X) +
+            (circumCenter[1]-objArr[0].Position.Y) * (circumCenter[1]-objArr[0].Position.Y) +
+            (circumCenter[2]-objArr[0].Position.Z) * (circumCenter[2]-objArr[0].Position.Z));
+
+        for (let i = 0; i < 3; i++) {
+            let toVector = solveLinearEquations(pointsToVector(objArr[i], circumCenter), normal, objArr[i]);
+            let speed = velocityMarshal(objArr[i], toVector);
+            objArr[i].Speed.XSpeed = speed[0];
+            objArr[i].Speed.YSpeed = speed[1];
+            objArr[i].Speed.ZSpeed = speed[2];
+        }
+    }
+
+    // 计算第一宇宙速度
     function calculateVelocity(index){
 
         if (objArr.length===3){
@@ -255,7 +304,7 @@ export default function Setting() {
                 }
             }
 
-            // 返回逃逸速度
+            // 返回第一宇宙速度
             return force / objArr[index].Mess * r;
         }else {
             return 0;
@@ -264,18 +313,12 @@ export default function Setting() {
 
     // 协议解析
     function Marshal(map){
-        // 方向坐标
-        // let position = [];
-        // //根据向量得出点坐标
-        // for (let i = 0; i < 3; i++) {
-        //     position[i] = solutions[i] + point[i];
-        // }
 
         let stringify = JSON.stringify(map);
         sessionStorage.setItem("protocol", stringify)
     }
 
-    let objArr = [];
+    // 协议其他数据
     let protocolData = {
         Star: 0,
         Timestamp: Math.floor(Date.now() / 1000),
@@ -285,16 +328,18 @@ export default function Setting() {
         SleepTime: 1
     };
 
-    const [velocity, setVelocity] = useState();
 
     // 数据变化一次就持久化一次
     useEffect(() => {
+        console.log(objArr)
         if (objArr.length === 3){
-            calculateCircumcenter(objArr);
+            calculateCircumcenter();
         }
 
-        // 速度范围计算一次
-        setVelocity(calculateVelocity(0));
+        for (let i = 0; i < 3; i++) {
+            calculateVelocity(i);
+        }
+
         protocolData.Objects.objects = objArr;
         Marshal(protocolData);
     }, [objArr]);
@@ -322,15 +367,15 @@ export default function Setting() {
             </Tabs>
             <SettingPanel value={value}
                           index={0}
-                          velocity={[velocity - velocity/2, velocity + velocity/2]}
+                          velocity={objsRang[0]}
                           callback={callBackFuc}/>
             <SettingPanel value={value}
                           index={1}
-                          velocity={[velocity - velocity/2, velocity + velocity/2]}
+                          velocity={objsRang[0]}
                           callback={callBackFuc}/>
             <SettingPanel value={value}
                           index={2}
-                          velocity={[velocity - velocity/2, velocity + velocity/2]}
+                          velocity={objsRang[0]}
                           callback={callBackFuc}/>
         </Box>
     );

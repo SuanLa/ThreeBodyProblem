@@ -14,7 +14,7 @@ export default function Router(){
             children: [
                 {
                     path: "/",
-                    element: <Navigate to="show" replace={true} />
+                    element: <Navigate to="setting" replace={true} />
                 },
                 {
                     path: "show",

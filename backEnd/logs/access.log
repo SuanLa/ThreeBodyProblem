@@ -107,3 +107,4 @@
 {"level":"info","time":"2024-03-29T16:45:58.874+0800","caller":"middleware/access_handler.go:14","msg":"Request received","request method":"GET","request URI":"/v1/track"}
 {"level":"info","time":"2024-03-29T16:47:52.245+0800","caller":"middleware/access_handler.go:14","msg":"Request received","request method":"GET","request URI":"/v1/track"}
 {"level":"info","time":"2024-03-29T16:48:33.128+0800","caller":"middleware/access_handler.go:14","msg":"Request received","request method":"GET","request URI":"/v1/track"}
+{"level":"info","time":"2024-05-23T22:18:51.145+0800","caller":"middleware/access_handler.go:14","msg":"Request received","request method":"GET","request URI":"/v1/track"}

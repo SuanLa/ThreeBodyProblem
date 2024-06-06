@@ -1,5 +1,5 @@
 
-export function connect(url, msg,handlerMessage) {
+export function connect(url, msg, handlerMessage) {
     const ws = new WebSocket(url);
 
     ws.onopen = () => {
