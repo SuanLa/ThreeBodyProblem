@@ -37,6 +37,7 @@ export default function Show(){
     // websocket连接后端
     const startRunning = () => {
         const url = "ws://localhost:6750/v1/track";
+        console.log("boolen" + objs.Star)
         let stringify = JSON.stringify(objs);
         webSocket = connect(url, stringify, messageHandler);
         console.log(toggle);

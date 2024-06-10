@@ -1,18 +1,24 @@
-import {useFrame, useLoader} from "@react-three/fiber";
+import {useFrame} from "@react-three/fiber";
 import "../css/Object.css";
-import {TextureLoader} from "three";
 
-import img_1 from "../img/img_1.png"
-import img_6 from "../img/img_6.png"
-import img_5 from "../img/img_5.png"
 import {useEffect, useRef} from "react";
+import {useTexture} from "@react-three/drei";
+
+import color from "../img/Lava004_2K-JPG_Color.jpg";
+import emission from "../img/Lava004_2K-JPG_Emission.jpg";
+import normalDX from "../img/Lava004_2K-JPG_NormalDX.jpg";
+import normalGL from "../img/Lava004_2K-JPG_NormalGL.jpg";
 
 export default function Object({position}){
     useEffect(()=>{
-        console.log(position)
     },[position])
 
-    const [colorMap, specularMap, normalMap] = useLoader(TextureLoader, [img_1, img_6, img_5])
+    const [colorMap, normalMap, roughnessMap] = useTexture([
+        color,
+        emission,
+        normalDX,
+        normalGL]
+    )
     const myMesh = useRef()
 
     useFrame(() => {
@@ -33,8 +39,8 @@ export default function Object({position}){
                 <sphereGeometry/>
                 <meshStandardMaterial
                     map={colorMap}
-                    roughnessMap={specularMap}
                     normalMap={normalMap}
+                    roughnessMap={roughnessMap}
                 />
             </mesh>
         </>

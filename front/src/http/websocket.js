@@ -3,6 +3,7 @@ export function connect(url, msg, handlerMessage) {
     const ws = new WebSocket(url);
 
     ws.onopen = () => {
+        console.log("send msg" + msg)
         ws.send(msg);
     };
 
