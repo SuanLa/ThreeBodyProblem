@@ -170,39 +170,39 @@ export default function Setting() {
             return [{
                 Mess: 10000,
                 Position: {
-                    X: 1,
-                    Y: -2,
-                    Z: 5
-                },
-                Speed: {
-                    XSpeed: 0.001,
-                    YSpeed: -0.001,
-                    ZSpeed: 0.001
-                },
-                Time: 0
-            }, {
-                Mess: 10000,
-                Position: {
-                    X: 1,
-                    Y: 3,
-                    Z: 2
-                },
-                Speed: {
-                    XSpeed: 0.001,
-                    YSpeed: 0.001,
-                    ZSpeed: 0.001
-                },
-                Time: 0
-            }, {
-                Mess: 10000,
-                Position: {
-                    X: -1,
-                    Y: -5,
+                    X: 0,
+                    Y: 4,
                     Z: 0
                 },
                 Speed: {
-                    XSpeed: -0.001,
-                    YSpeed: -0.001,
+                    XSpeed: -0.008,
+                    YSpeed: 0,
+                    ZSpeed: 0
+                },
+                Time: 0
+            }, {
+                Mess: 10000,
+                Position: {
+                    X: 3.464,
+                    Y: -2,
+                    Z: 0
+                },
+                Speed: {
+                    XSpeed: 0.004,
+                    YSpeed: 0.0069,
+                    ZSpeed: 0
+                },
+                Time: 0
+            }, {
+                Mess: 10000,
+                Position: {
+                    X: -3.464,
+                    Y: -2,
+                    Z: 0
+                },
+                Speed: {
+                    XSpeed: 0.004,
+                    YSpeed: -0.0069,
                     ZSpeed: 0
                 },
                 Time: 0
