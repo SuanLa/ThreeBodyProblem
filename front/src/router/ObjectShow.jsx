@@ -11,12 +11,11 @@ import SkipNextIcon from '@mui/icons-material/SkipNext';
 import Controls from "../component/Control";
 
 
-let webSocket;
-
-// 开启关闭触发变量
-let toggle = true;
-
 export default function Show(){
+    let webSocket;
+
+    // 开启关闭触发变量
+    const [toggle, setToggle] = useState(false);
 
     // 初始化组件
     function init(){
@@ -37,20 +36,30 @@ export default function Show(){
     // websocket连接后端
     const startRunning = () => {
         const url = "ws://localhost:6750/v1/track";
-        console.log("boolen" + objs.Star)
+        console.log("boolean" + objs.Star)
+        let item = sessionStorage.getItem("protocol");
+        let parse = JSON.parse(item);
+        parse.Star = true;
+        setObjs(parse);
+
         let stringify = JSON.stringify(objs);
         webSocket = connect(url, stringify, messageHandler);
-        console.log(toggle);
-        toggle = false;
+        console.log("starBefore => " + toggle);
+        setToggle(false);
+        console.log("starAfter => " + toggle);
     }
 
     // websocket断开连接
     const stopRunning = () => {
-        if (webSocket !== null){
+            objs.Star = false;
+            let stringify = JSON.stringify(objs);
+            sessionStorage.setItem("protocol", stringify);
+
             webSocket.close();
-            console.log(toggle);
-            toggle = true;
-        }
+            console.log("stopBefore => " + toggle);
+            setToggle(true);
+            console.log("stopAfter => " + toggle);
+
     }
 
     const theme = useTheme();
@@ -65,13 +74,13 @@ export default function Show(){
                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', pl: 1, pb: 1 }}>
                         <IconButton aria-label="previous">
-                            {theme.direction === 'rtl' ? <SkipNextIcon /> : <SkipPreviousIcon />}
+                            <SkipPreviousIcon onClick={() => setObjs(objs.SleepTime * 0.5)}/>
                         </IconButton>
                         <IconButton aria-label="play/pause">
                             <PlayArrowIcon sx={{ height: 38, width: 38 }} onClick={ toggle===true ? startRunning : stopRunning }/>
                         </IconButton>
                         <IconButton aria-label="next">
-                            {theme.direction === 'rtl' ? <SkipPreviousIcon /> : <SkipNextIcon />}
+                            <SkipNextIcon onClick={() => {setObjs(objs.SleepTime * 2); console.log(objs)}}/>
                         </IconButton>
                     </Box>
                 </Box>
