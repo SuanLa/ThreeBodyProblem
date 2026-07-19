@@ -1,13 +1,11 @@
 package algorithm
 
-import "math"
-
-// 定义一个物体结构体
+// 定义一个物体结构体。json tag 与前端协议保持兼容（历史原因质量字段名为 Mess）
 type Object struct {
-	Mess     uint64   `json:"Mess"`
+	Mass     float64  `json:"Mess"`
 	Position Position `json:"Position"`
 	Speed    Speed    `json:"Speed"`
-	Time     uint64   `json:"Time"`
+	Time     float64  `json:"Time"`
 }
 
 // 定义分解后的速度结构体
@@ -24,33 +22,47 @@ type Position struct {
 	Z float64 `json:"Z"`
 }
 
-// 每秒更新物体位置的方法
-func (o Object) Update(ax, ay, az float64) Object {
-	// 计算末速度
-	vx := o.Speed.XSpeed + ax*Time
-	vy := o.Speed.YSpeed + ay*Time
-	vz := o.Speed.ZSpeed + az*Time
+// 位置的向量视图
+func (o *Object) Pos() Vec3 {
+	return Vec3{o.Position.X, o.Position.Y, o.Position.Z}
+}
 
-	// 计算平均速度
-	avgX := (vx + o.Speed.XSpeed) / 2
-	avgY := (vy + o.Speed.YSpeed) / 2
-	avgZ := (vz + o.Speed.ZSpeed) / 2
+// 速度的向量视图
+func (o *Object) Vel() Vec3 {
+	return Vec3{o.Speed.XSpeed, o.Speed.YSpeed, o.Speed.ZSpeed}
+}
 
-	// 更新速度
-	o.Speed.XSpeed = vx
-	o.Speed.YSpeed = vy
-	o.Speed.ZSpeed = vz
+func (o *Object) SetPos(v Vec3) {
+	o.Position = Position{X: v.X, Y: v.Y, Z: v.Z}
+}
 
-	// 更新物体的位置
-	o.Position.X += avgX * Time
-	o.Position.Y += avgY * Time
-	o.Position.Z += avgZ * Time
-
-	return o
+func (o *Object) SetVel(v Vec3) {
+	o.Speed = Speed{XSpeed: v.X, YSpeed: v.Y, ZSpeed: v.Z}
 }
 
 // 计算物体绝对速度的方法
 func (o *Object) AbsolutionSpeed() float64 {
-	speed := math.Sqrt(math.Pow(float64(o.Speed.XSpeed), 2) + math.Pow(float64(o.Speed.YSpeed), 2))
-	return math.Sqrt(math.Pow(speed, 2) + math.Pow(float64(o.Speed.ZSpeed), 2))
+	return o.Vel().Norm()
+}
+
+// 协议中的物体数组容器
+type ArrayObjects struct {
+	Objects []Object `json:"objects"`
+}
+
+func (ao *ArrayObjects) GetObjects() []Object {
+	return ao.Objects
+}
+
+// 添加物体到数组的方法
+func (ao *ArrayObjects) Add(obj Object) {
+	ao.Objects = append(ao.Objects, obj)
+}
+
+// 移除物体的方法
+func (ao *ArrayObjects) Remove(index int) {
+	if index < 0 || index >= len(ao.Objects) {
+		return
+	}
+	ao.Objects = append(ao.Objects[:index], ao.Objects[index+1:]...)
 }

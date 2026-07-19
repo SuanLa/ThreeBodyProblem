@@ -2,7 +2,6 @@ package api
 
 import (
 	"backEnd/utils/logger"
-	"backEnd/utils/protocol"
 	"backEnd/utils/ws"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -11,17 +10,8 @@ import (
 )
 
 func WsHandler(c *gin.Context) {
-	ws.New(c)
-
-	// 使用带缓冲通道
-	ch := make(chan *protocol.Protocol, 100)
-	st := make(chan bool)
-	go ws.Rec(ch, st)
-	go ws.SendMsg(ch)
-
-	if <-st {
-		return
-	}
+	// 每条连接一个独立会话，Handle 内部阻塞直到连接关闭
+	ws.Handle(c)
 }
 
 func TestHandler(c *gin.Context) {
