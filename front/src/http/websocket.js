@@ -1,19 +1,19 @@
 
-export function connect(url, msg, handlerMessage) {
+export function connect(url, msg, handlerMessage, handlerClose) {
     const ws = new WebSocket(url);
 
     ws.onopen = () => {
-        console.log("send msg" + msg)
         ws.send(msg);
     };
 
     ws.onmessage = (event) => {
-        // console.log(event)
         handlerMessage(event.data)
     };
 
     ws.onclose = (event) => {
-        console.log(event);
+        if (handlerClose) {
+            handlerClose(event)
+        }
     };
 
     ws.onerror = (event) => {

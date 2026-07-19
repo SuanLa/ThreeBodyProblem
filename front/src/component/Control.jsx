@@ -1,20 +1,8 @@
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import {extend, useFrame, useThree} from "@react-three/fiber";
-import {useRef} from "react"; // 导入 OrbitControls
+import {OrbitControls} from "@react-three/drei";
 
-// 将 OrbitControls 扩展为可在 React-Three-Fiber 中使用的组件
-extend({ OrbitControls });
-
+// 相机轨道控制器，开启阻尼让拖动视角更顺滑
 export default function Controls() {
-    const { camera, gl } = useThree();
-    const controlsRef = useRef();
-
-    // 在每一帧更新 OrbitControls
-    useFrame(() => {
-        controlsRef.current.update();
-    });
-
     return (
-        <orbitControls ref={controlsRef} args={[camera, gl.domElement]} />
+        <OrbitControls makeDefault enableDamping dampingFactor={0.08}/>
     );
 }
