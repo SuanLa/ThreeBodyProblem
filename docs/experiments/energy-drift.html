@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>积分器能量漂移对比实验</title>
+<style>
+  :root {
+    --surface: #fcfcfb;
+    --page: #f9f9f7;
+    --ink: #0b0b0b;
+    --ink-2: #52514e;
+    --muted: #898781;
+    --grid: #e1e0d9;
+    --baseline: #c3c2b7;
+    --euler: #2a78d6;
+    --verlet: #008300;
+    --rk4: #e87ba4;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--page);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    line-height: 1.6;
+  }
+  main { max-width: 860px; margin: 0 auto; padding: 32px 20px 64px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  h2 { font-size: 16px; margin: 36px 0 4px; }
+  .sub { color: var(--ink-2); font-size: 13px; margin: 0 0 16px; }
+  .card {
+    background: var(--surface);
+    border: 1px solid rgba(11,11,11,0.10);
+    border-radius: 8px;
+    padding: 16px;
+    position: relative;
+  }
+  .legend { display: flex; gap: 16px; font-size: 12px; color: var(--ink-2); margin-bottom: 8px; flex-wrap: wrap; }
+  .legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .chip { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+  svg { display: block; width: 100%; height: auto; }
+  .tooltip {
+    position: absolute; pointer-events: none; display: none;
+    background: var(--ink); color: #fff; font-size: 12px;
+    padding: 6px 9px; border-radius: 4px; white-space: nowrap; z-index: 3;
+    font-variant-numeric: tabular-nums;
+  }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; margin-top: 12px; font-variant-numeric: tabular-nums; }
+  th, td { padding: 5px 10px; text-align: right; border-bottom: 1px solid var(--grid); }
+  th { color: var(--ink-2); font-weight: 600; }
+  td:first-child, th:first-child { text-align: left; }
+  .note { color: var(--muted); font-size: 12px; margin-top: 10px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>积分器能量漂移对比实验</h1>
+  <p class="sub">
+    测试场景：Chenciner-Montgomery 八字轨道（G=1，等质量 m=1，周期 T≈6.3259）。
+    实验一以 dt=10⁻³ 连续积分 10 个周期，记录相对能量误差 |ΔE/E₀| 随时间的演化；
+    实验二固定积分 1 个周期，扫描时间步长，测量误差包络最大值的收敛速度。
+  </p>
+
+  <h2>实验一：长期能量误差演化（对数纵轴）</h2>
+  <p class="sub">显式欧拉的误差单调增长；速度 Verlet（辛积分器）误差有界振荡不漂移；RK4 精度最高但非辛。</p>
+  <div class="card" id="drift-card">
+    <div class="legend">
+      <span><i class="chip" style="background:var(--euler)"></i>显式欧拉 Euler</span>
+      <span><i class="chip" style="background:var(--verlet)"></i>速度 Verlet</span>
+      <span><i class="chip" style="background:var(--rk4)"></i>RK4</span>
+    </div>
+    <svg id="drift-svg" viewBox="0 0 820 360" role="img" aria-label="能量误差随时间变化曲线"></svg>
+    <div class="tooltip" id="drift-tip"></div>
+    <table id="drift-table"></table>
+    <p class="note">表为各周期末端采样值；完整数据（1265 个采样点）见 drift_vs_time.csv。竖直细线为周期边界。</p>
+  </div>
+
+  <h2>实验二：误差包络对步长的收敛阶（双对数）</h2>
+  <p class="sub">
+    取 1 个周期内 |ΔE/E₀| 的最大值（误差包络）。之所以不用周期末端值：八字轨道高度对称，
+    辛积分器的能量误差在轨道闭合处大幅相互抵消，末端值会把收敛阶虚高到 5 阶左右；
+    包络最大值才反映方法的真实精度。RK4 在 dt≤10⁻³ 后逼近浮点舍入地板（~10⁻¹⁴），该区域不参与拟合。
+  </p>
+  <div class="card" id="conv-card">
+    <div class="legend">
+      <span><i class="chip" style="background:var(--euler)"></i>Euler</span>
+      <span><i class="chip" style="background:var(--verlet)"></i>Verlet</span>
+      <span><i class="chip" style="background:var(--rk4)"></i>RK4</span>
+      <span style="color:var(--muted)">虚线为 O(dt)、O(dt²)、O(dt⁴) 参考斜率</span>
+    </div>
+    <svg id="conv-svg" viewBox="0 0 820 360" role="img" aria-label="误差随步长收敛曲线"></svg>
+    <div class="tooltip" id="conv-tip"></div>
+    <table id="conv-table"></table>
+  </div>
+</main>
+
+<script src="data.js"></script>
+<script>
+const SERIES = [
+  {key: "euler", label: "Euler", color: "var(--euler)"},
+  {key: "verlet", label: "Verlet", color: "var(--verlet)"},
+  {key: "rk4", label: "RK4", color: "var(--rk4)"},
+];
+const PAD = {l: 62, r: 70, t: 14, b: 34};
+const W = 820, H = 360;
+const plotW = W - PAD.l - PAD.r, plotH = H - PAD.t - PAD.b;
+
+const SUP = {"0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹","-":"⁻"};
+const expLabel = (n) => "10" + String(n).split("").map((c) => SUP[c] || c).join("");
+const fmt = (v) => v === undefined || v === null || !isFinite(v) ? "—" : v.toExponential(2);
+
+function el(name, attrs, text) {
+  const node = document.createElementNS("http://www.w3.org/2000/svg", name);
+  for (const k in attrs) node.setAttribute(k, attrs[k]);
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+
+// 通用坐标框架：横轴线性或对数，纵轴对数
+function frame(svg, xMin, xMax, yMinExp, yMaxExp, xTicks, xTickFmt) {
+  const xAt = (x) => PAD.l + (x - xMin) / (xMax - xMin) * plotW;
+  const yAt = (v) => PAD.t + (1 - (Math.log10(v) - yMinExp) / (yMaxExp - yMinExp)) * plotH;
+
+  for (let e = yMinExp; e <= yMaxExp; e++) {
+    const y = PAD.t + (1 - (e - yMinExp) / (yMaxExp - yMinExp)) * plotH;
+    svg.appendChild(el("line", {x1: PAD.l, x2: W - PAD.r, y1: y, y2: y, stroke: "var(--grid)", "stroke-width": 1}));
+    svg.appendChild(el("text", {x: PAD.l - 8, y: y + 4, "text-anchor": "end", "font-size": 11, fill: "var(--muted)"}, expLabel(e)));
+  }
+  for (const x of xTicks) {
+    svg.appendChild(el("line", {x1: xAt(x), x2: xAt(x), y1: PAD.t, y2: PAD.t + plotH, stroke: "var(--grid)", "stroke-width": 1}));
+    svg.appendChild(el("text", {x: xAt(x), y: H - PAD.b + 18, "text-anchor": "middle", "font-size": 11, fill: "var(--muted)"}, xTickFmt(x)));
+  }
+  svg.appendChild(el("line", {x1: PAD.l, x2: W - PAD.r, y1: PAD.t + plotH, y2: PAD.t + plotH, stroke: "var(--baseline)", "stroke-width": 1}));
+  return {xAt, yAt};
+}
+
+function path(points) {
+  return points.map((p, i) => (i === 0 ? "M" : "L") + p[0].toFixed(1) + " " + p[1].toFixed(1)).join("");
+}
+
+function endLabel(svg, x, y, text, color) {
+  svg.appendChild(el("rect", {x: x + 5, y: y - 5, width: 8, height: 8, rx: 2, fill: color}));
+  svg.appendChild(el("text", {x: x + 17, y: y + 4, "font-size": 11, fill: "var(--ink-2)"}, text));
+}
+
+/* ---------- 实验一：漂移-时间 ---------- */
+(function () {
+  const svg = document.getElementById("drift-svg");
+  const D = window.DRIFT;
+  const FLOOR = 1e-16;
+
+  let lo = 0;
+  for (const s of SERIES) for (const v of D[s.key].v) if (v > FLOOR) lo = Math.min(lo || v, v);
+  const yMinExp = Math.floor(Math.log10(lo || FLOOR));
+  const yMaxExp = 0;
+  const tMax = 10 * window.PERIOD;
+
+  const periodTicks = [];
+  for (let k = 2; k <= 10; k += 2) periodTicks.push(k * window.PERIOD);
+  const {xAt, yAt} = frame(svg, 0, tMax, yMinExp, yMaxExp, periodTicks, (x) => (x / window.PERIOD).toFixed(0) + "T");
+
+  for (const s of SERIES) {
+    const pts = [];
+    for (let i = 0; i < D[s.key].t.length; i++) {
+      const v = Math.max(D[s.key].v[i], FLOOR);
+      pts.push([xAt(D[s.key].t[i]), yAt(v)]);
+    }
+    svg.appendChild(el("path", {d: path(pts), fill: "none", stroke: s.color, "stroke-width": 2, "stroke-linejoin": "round"}));
+    const last = pts[pts.length - 1];
+    endLabel(svg, last[0], last[1], s.label, s.color);
+  }
+
+  // 悬浮：最近采样点十字线 + 数值
+  const tip = document.getElementById("drift-tip");
+  const card = document.getElementById("drift-card");
+  const hoverLine = el("line", {y1: PAD.t, y2: PAD.t + plotH, stroke: "var(--baseline)", "stroke-width": 1, visibility: "hidden"});
+  svg.appendChild(hoverLine);
+  svg.addEventListener("mousemove", (ev) => {
+    const rect = svg.getBoundingClientRect();
+    const sx = (ev.clientX - rect.left) / rect.width * W;
+    const t = (sx - PAD.l) / plotW * tMax;
+    const ts = D.euler.t;
+    let i = Math.round(t / (ts[1] - ts[0])) - 1;
+    i = Math.max(0, Math.min(ts.length - 1, i));
+    hoverLine.setAttribute("x1", xAt(ts[i]));
+    hoverLine.setAttribute("x2", xAt(ts[i]));
+    hoverLine.setAttribute("visibility", "visible");
+    tip.style.display = "block";
+    tip.style.left = Math.min(ev.clientX - card.getBoundingClientRect().left + 14, card.clientWidth - 190) + "px";
+    tip.style.top = (ev.clientY - card.getBoundingClientRect().top + 14) + "px";
+    tip.innerHTML = "t = " + ts[i].toFixed(2) +
+      "<br>Euler&nbsp;&nbsp;" + fmt(D.euler.v[i]) +
+      "<br>Verlet&nbsp;" + fmt(D.verlet.v[i]) +
+      "<br>RK4&nbsp;&nbsp;&nbsp;" + fmt(D.rk4.v[i]);
+  });
+  svg.addEventListener("mouseleave", () => {
+    tip.style.display = "none";
+    hoverLine.setAttribute("visibility", "hidden");
+  });
+
+  // 周期末端采样表
+  const rows = [];
+  for (let k = 1; k <= 10; k++) {
+    const target = k * window.PERIOD;
+    let best = 0;
+    for (let i = 0; i < D.euler.t.length; i++) {
+      if (Math.abs(D.euler.t[i] - target) < Math.abs(D.euler.t[best] - target)) best = i;
+    }
+    rows.push("<tr><td>" + k + "T</td><td>" + fmt(D.euler.v[best]) + "</td><td>" + fmt(D.verlet.v[best]) + "</td><td>" + fmt(D.rk4.v[best]) + "</td></tr>");
+  }
+  document.getElementById("drift-table").innerHTML =
+    "<tr><th>时刻</th><th>Euler</th><th>Verlet</th><th>RK4</th></tr>" + rows.join("");
+})();
+
+/* ---------- 实验二：收敛阶 ---------- */
+(function () {
+  const svg = document.getElementById("conv-svg");
+  const C = window.CONVERGENCE;
+
+  const xs = C.dts.map(Math.log10);
+  const xMin = Math.min(...xs) - 0.15, xMax = Math.max(...xs) + 0.15;
+  let lo = Infinity, hi = 0;
+  for (const s of SERIES) for (const v of C[s.key]) { lo = Math.min(lo, v); hi = Math.max(hi, v); }
+  const yMinExp = Math.floor(Math.log10(lo));
+  const yMaxExp = Math.ceil(Math.log10(hi));
+
+  const {xAt, yAt} = frame(svg, xMin, xMax, yMinExp, yMaxExp, xs, (x) => expLabel(Math.round(x)));
+
+  // 参考斜率虚线：锚定各自系列最粗步长点上方 5 倍处
+  const guides = [{order: 1, anchor: "euler"}, {order: 2, anchor: "verlet"}, {order: 4, anchor: "rk4"}];
+  for (const g of guides) {
+    const y0 = C[g.anchor][0] * 5;
+    const pts = C.dts.map((dt, i) => [xAt(xs[i]), yAt(y0 * Math.pow(dt / C.dts[0], g.order))]);
+    svg.appendChild(el("path", {d: path(pts), fill: "none", stroke: "var(--baseline)", "stroke-width": 1, "stroke-dasharray": "5 4"}));
+    const supMap = {1: "O(dt)", 2: "O(dt²)", 4: "O(dt⁴)"};
+    svg.appendChild(el("text", {x: pts[0][0] - 4, y: pts[0][1] - 6, "font-size": 10, fill: "var(--muted)", "text-anchor": "start"}, supMap[g.order]));
+  }
+
+  const tip = document.getElementById("conv-tip");
+  const card = document.getElementById("conv-card");
+  for (const s of SERIES) {
+    const pts = C.dts.map((dt, i) => [xAt(xs[i]), yAt(C[s.key][i])]);
+    svg.appendChild(el("path", {d: path(pts), fill: "none", stroke: s.color, "stroke-width": 2, "stroke-linejoin": "round"}));
+    pts.forEach((p, i) => {
+      const dot = el("circle", {cx: p[0], cy: p[1], r: 4, fill: s.color, stroke: "var(--surface)", "stroke-width": 2});
+      dot.addEventListener("mousemove", (ev) => {
+        tip.style.display = "block";
+        tip.style.left = Math.min(ev.clientX - card.getBoundingClientRect().left + 14, card.clientWidth - 170) + "px";
+        tip.style.top = (ev.clientY - card.getBoundingClientRect().top + 14) + "px";
+        tip.innerHTML = s.label + "<br>dt = " + C.dts[i].toExponential(0) + "<br>max|ΔE/E₀| = " + fmt(C[s.key][i]);
+      });
+      dot.addEventListener("mouseleave", () => { tip.style.display = "none"; });
+      svg.appendChild(dot);
+    });
+    endLabel(svg, pts[pts.length - 1][0], pts[pts.length - 1][1], s.label, s.color);
+  }
+
+  // 数据表 + 拟合收敛阶
+  const fitOrder = (errs) => {
+    const px = [], py = [];
+    for (let i = 0; i < C.dts.length; i++) {
+      if (errs[i] > 1e-12) { px.push(Math.log(C.dts[i])); py.push(Math.log(errs[i])); }
+    }
+    const n = px.length;
+    if (n < 2) return NaN;
+    const sx = px.reduce((a, b) => a + b, 0), sy = py.reduce((a, b) => a + b, 0);
+    const sxx = px.reduce((a, b) => a + b * b, 0), sxy = px.reduce((a, b, i) => a + b * py[i], 0);
+    return (n * sxy - sx * sy) / (n * sxx - sx * sx);
+  };
+  const rows = C.dts.map((dt, i) =>
+    "<tr><td>" + dt.toExponential(0) + "</td><td>" + fmt(C.euler[i]) + "</td><td>" + fmt(C.verlet[i]) + "</td><td>" + fmt(C.rk4[i]) + "</td></tr>"
+  );
+  rows.push("<tr><th>拟合收敛阶</th><th>" + fitOrder(C.euler).toFixed(2) + "</th><th>" + fitOrder(C.verlet).toFixed(2) + "</th><th>" + fitOrder(C.rk4).toFixed(2) + "</th></tr>");
+  document.getElementById("conv-table").innerHTML =
+    "<tr><th>dt</th><th>Euler</th><th>Verlet</th><th>RK4</th></tr>" + rows.join("");
+})();
+</script>
+</body>
+</html>
